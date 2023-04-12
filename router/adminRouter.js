@@ -4,6 +4,7 @@ const adAuthController = require("../controller/adminAuthController");
 const adminAuth = require("../middleware/adminAuth")
 const adminRouter = express.Router();
 
+
 adminRouter.post('/addAdmin',adminControllers.addAdmin);
 adminRouter.get('/userData', adminAuth.authenticateToken , adminControllers.userData);
 adminRouter.get("/managerData",adminAuth.authenticateToken ,   adminControllers.managerData);
