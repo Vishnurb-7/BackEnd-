@@ -1,10 +1,8 @@
-const { Provider } = require("../model/eventManagerModel")
+const { Provider } = require("../model/eventManagerModel");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const Joi = require("joi");
-// const ObjectId = require('mongodb').ObjectId;
-const { response } = require("express");
 const { Estimate } = require("../model/estimateModel");
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -20,12 +18,10 @@ async function sendOtp(mobile) {
       .verifications.create({ to: `+91${mobile}`, channel: "sms" });
     return { status: true, verification };
   } catch (error) {
-   
     return { status: false, error };
   }
   return { status: verification.status };
 }
-
 
 async function otpVerifyFunction(otp, mobile) {
   const verification_check = await client.verify.v2
@@ -34,16 +30,13 @@ async function otpVerifyFunction(otp, mobile) {
   if (verification_check.status == "approved") {
     return { status: true };
   } else {
-
     return { status: false };
   }
 }
 
-
 const signupWithEmail = async (req, res) => {
-
   const hash = await bcrypt.hash(req.body.providerData.password, 5);
-    try {
+  try {
     const provider = new Provider({
       companyname: req.body.providerData.companyName,
       description: req.body.providerData.description,
@@ -60,8 +53,6 @@ const signupWithEmail = async (req, res) => {
 
     const response = await sendOtp(req.body.providerData.phone);
 
-
-
     if (response.status === true) {
       res.status(201).json({
         message: `success`,
@@ -74,13 +65,11 @@ const signupWithEmail = async (req, res) => {
       });
     }
   } catch (error) {
-
     res.status(400).json({ message: "error", error });
   }
-}
+};
 //   };
 exports.signupWithEmail = signupWithEmail;
-
 
 const otpVerify = async (req, res) => {
   try {
@@ -94,17 +83,15 @@ const otpVerify = async (req, res) => {
       res.status(400).json({ message: " invalid otp verification " });
     }
   } catch (error) {
-
     res.status(400).json({ message: "otp failed", error: error.massage });
   }
 };
 exports.otpVerify = otpVerify;
 
-
 const resendOtp = async (req, res) => {
   try {
     const { mobile } = req.body;
-    const response = await sendOtp(mobile)
+    const response = await sendOtp(mobile);
 
     if (response.status === true) {
       res.status(201).json({
@@ -120,7 +107,7 @@ const resendOtp = async (req, res) => {
   } catch (error) {
     res.status(400).json({ message: "error", error });
   }
-}
+};
 exports.resendOtp = resendOtp;
 
 const forgotPassword = async (req, res) => {
@@ -156,7 +143,6 @@ const ChangePasswordOtp = async (req, res) => {
   try {
     const { mobile, otp } = req.body;
     const response = await otpVerifyFunction(otp, mobile);
-
 
     if (response.status === true) {
       const provider = await Provider.findOne({
@@ -199,7 +185,6 @@ const changePassword = async (req, res) => {
     if (error) return res.status(400).send(error.details[0].message);
     const { password, userId, passwordToken } = req.body;
 
-
     const provider = await Provider.findById(userId);
     if (!provider)
       return res
@@ -220,10 +205,7 @@ const changePassword = async (req, res) => {
 };
 exports.changePassword = changePassword;
 
-
 const providerDetails = async (req, res) => {
-
-
   try {
     const provider = await Provider.findOne({ email: req.body.email });
 
@@ -231,7 +213,7 @@ const providerDetails = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error });
   }
-}
+};
 exports.providerDetails = providerDetails;
 
 const addService = async (req, res) => {
@@ -239,13 +221,18 @@ const addService = async (req, res) => {
 
   if (data && managers) {
     try {
-      await Provider.findOneAndUpdate({ email: managers }, { $push: { category: data } })
-      res.status(201).json({ message: "success" })
+      await Provider.findOneAndUpdate(
+        { email: managers },
+        { $push: { category: data } }
+      );
+      res.status(201).json({ message: "success" });
     } catch (error) {
-      res.status(500).json({ message: error })
+      res.status(500).json({ message: error });
     }
-  } else { res.status(500).json({ message: "error" }) }
-}
+  } else {
+    res.status(500).json({ message: "error" });
+  }
+};
 exports.addService = addService;
 
 const removeService = async (req, res) => {
@@ -253,22 +240,27 @@ const removeService = async (req, res) => {
 
   if (data && managers) {
     try {
-      await Provider.findOneAndUpdate({ email: managers }, { $pull: { category: data } })
-      res.status(201).json({ message: "success" })
+      await Provider.findOneAndUpdate(
+        { email: managers },
+        { $pull: { category: data } }
+      );
+      res.status(201).json({ message: "success" });
     } catch (error) {
-      res.status(500).json({ message: error })
+      res.status(500).json({ message: error });
     }
-  } else { res.status(500).json({ message: "error" }) }
-}
+  } else {
+    res.status(500).json({ message: "error" });
+  }
+};
 exports.removeService = removeService;
 
-
 const addImageOrVideo = async (req, res) => {
-
   const { imageUrl, videoUrl, managers } = req.body;
 
   if (!imageUrl && !videoUrl) {
-    return res.status(400).json({ message: "Please provide either an image or video URL" });
+    return res
+      .status(400)
+      .json({ message: "Please provide either an image or video URL" });
   }
 
   try {
@@ -288,65 +280,82 @@ const addImageOrVideo = async (req, res) => {
 
     res.status(201).json({ message: "Media added successfully" });
   } catch (error) {
-
     res.status(500).json({ message: "Something went wrong" });
   }
 };
 
 exports.addImageOrVideo = addImageOrVideo;
 
-
-
-
 const removeImage = async (req, res) => {
   const { imageUrl, managers } = req.body;
-  if (imageUrl, managers) {
+  if ((imageUrl, managers)) {
     try {
-      const result = await Provider.findOneAndUpdate({ email: managers }, { $pull: { gallery: imageUrl } })
+      const result = await Provider.findOneAndUpdate(
+        { email: managers },
+        { $pull: { gallery: imageUrl } }
+      );
 
-      res.status(201).json({ message: "success" })
+      res.status(201).json({ message: "success" });
     } catch (error) {
-      res.status(500).json({ message: error })
+      res.status(500).json({ message: error });
     }
-  } else { res.status(500).json({ message: "error" }) }
-}
+  } else {
+    res.status(500).json({ message: "error" });
+  }
+};
 exports.removeImage = removeImage;
 
 const editProfileGet = async (req, res) => {
   const email = req.query.managers;
   try {
     const profile = await Provider.findOne({ email: email });
-    profile ?
-      res.status(201).json({ profile }) :
-      res.status(500).json({ message: "error" })
+    profile
+      ? res.status(201).json({ profile })
+      : res.status(500).json({ message: "error" });
   } catch (error) {
-    res.status(500).json({ message: "error" })
+    res.status(500).json({ message: "error" });
   }
-
-}
+};
 exports.editProfileGet = editProfileGet;
 
 const editProfilePut = async (req, res) => {
-  const { email, name, description, place } = req.body
+  const { email, name, description, place } = req.body;
 
   if (req.body.coverPhotoUrl && req.body.profilePhotoUrl) {
     try {
-      await Provider.findOneAndUpdate({email}, { companyname: name, description: description, place: place, coverPhoto: req.body.coverPhotoUrl, profilePhoto: req.body.profilePhotoUrl })
-      res.status(201).json({ message: "success" })
+      await Provider.findOneAndUpdate(
+        { email },
+        {
+          companyname: name,
+          description: description,
+          place: place,
+          coverPhoto: req.body.coverPhotoUrl,
+          profilePhoto: req.body.profilePhotoUrl,
+        }
+      );
+      res.status(201).json({ message: "success" });
     } catch (error) {
-      res.status(500).json({ message: error })
+      res.status(500).json({ message: error });
     }
   } else {
     try {
-      await Provider.findOneAndUpdate({email}, { companyname: name, description: description, place: place, coverPhoto: "", profilePhoto: "" })
-      res.status(201).json({ message: "success" })
+      await Provider.findOneAndUpdate(
+        { email },
+        {
+          companyname: name,
+          description: description,
+          place: place,
+          coverPhoto: "",
+          profilePhoto: "",
+        }
+      );
+      res.status(201).json({ message: "success" });
     } catch (error) {
-      res.status(500).json({ message: error })
+      res.status(500).json({ message: error });
     }
   }
-}
-exports.editProfilePut = editProfilePut
-
+};
+exports.editProfilePut = editProfilePut;
 
 const chatUsers = async (req, res) => {
   try {
@@ -363,48 +372,51 @@ exports.chatUsers = chatUsers;
 const addEstimate = async (req, res) => {
   const { userId, managerId, estimate } = req.body;
   const estimates = new Estimate({
-    userId, managerId, estimate
-  })
+    userId,
+    managerId,
+    estimate,
+  });
   try {
-    await estimates.save()
-    res.status(201).json({ message: "success" })
-
+    await estimates.save();
+    res.status(201).json({ message: "success" });
   } catch (error) {
-    res.status(500).json({ message: "success" })
+    res.status(500).json({ message: "success" });
   }
-}
+};
 exports.addEstimate = addEstimate;
 const estimateDetails = async (req, res) => {
   const { userId, managerId } = req.params;
   try {
-    const result = await Estimate.find({ userId, managerId })
-    res.status(201).json(result)
+    const result = await Estimate.find({ userId, managerId });
+    res.status(201).json(result);
   } catch (error) {
     res.status(500).json(error);
   }
-}
+};
 exports.estimateDetails = estimateDetails;
 
 const orders = async (req, res) => {
   const { Id } = req.params;
   try {
-    const result = await Estimate.find({ managerId: Id })
-    res.status(201).json(result)
+    const result = await Estimate.find({ managerId: Id });
+    res.status(201).json(result);
   } catch (error) {
-    res.status(500).json(error)
+    res.status(500).json(error);
   }
-}
-exports.orders = orders
+};
+exports.orders = orders;
 
 const orderDescription = async (req, res) => {
   const { description, id } = req.body;
   try {
-    const result = await Estimate.findByIdAndUpdate(id, { description: description })
-    result.description = description
-    res.status(201).json(result)
+    const result = await Estimate.findByIdAndUpdate(id, {
+      description: description,
+    });
+    result.description = description;
+    res.status(201).json(result);
   } catch (error) {
-    res.status(500).json(error)
+    res.status(500).json(error);
   }
-}
+};
 
-exports.orderDescription = orderDescription
+exports.orderDescription = orderDescription;

@@ -15,7 +15,7 @@ userRouter.post('/userToken', userAuthController.userToken);
 userRouter.post('/forgotPassword', userControllers.forgotPassword);
 userRouter.post('/ChangePasswordOtp', userControllers.ChangePasswordOtp);
 userRouter.post('/changePassword', userControllers.changePassword);
-userRouter.get('/findManagers',authenticateToken, userControllers.findManagers);
+userRouter.get('/findManagers', userControllers.findManagers);
 userRouter.get('/managerProfile',authenticateToken,  userControllers.managerProfile);
 userRouter.get('/chatManagers/:id',authenticateToken,  userControllers.chatManagers);
 userRouter.post('/estimateData',authenticateToken,  userControllers.estimateData);

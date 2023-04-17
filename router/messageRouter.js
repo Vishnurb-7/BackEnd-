@@ -4,9 +4,9 @@ const { authenticateToken } = require("../middleware/userAuth");
 
 const messageRouter = express.Router();
 
-messageRouter.post('/', addMessage);
+messageRouter.post('/',addMessage);
 
-messageRouter.get('/:chatId', getMessages);
+messageRouter.get('/:chatId',getMessages);
 
 
 module.exports = messageRouter;
