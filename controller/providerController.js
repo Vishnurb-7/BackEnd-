@@ -35,6 +35,7 @@ async function otpVerifyFunction(otp, mobile) {
 }
 
 const signupWithEmail = async (req, res) => {
+  console.log(req.body);
   const hash = await bcrypt.hash(req.body.providerData.password, 5);
   try {
     const provider = new Provider({
