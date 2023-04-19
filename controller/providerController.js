@@ -36,7 +36,7 @@ async function otpVerifyFunction(otp, mobile) {
 
 const signupWithEmail = async (req, res) => {
   console.log(req.body);
-  const hash = await bcrypt.hash(req.body.providerData.password, 5);
+  const hash = await bcrypt.hash(req.body.providerData.password, 10);
   try {
     const provider = new Provider({
       companyname: req.body.providerData.companyName,
@@ -372,6 +372,7 @@ exports.chatUsers = chatUsers;
 
 const addEstimate = async (req, res) => {
   const { userId, managerId, estimate } = req.body;
+  console.log("enter in estimate",req.body);
   const estimates = new Estimate({
     userId,
     managerId,
@@ -381,6 +382,7 @@ const addEstimate = async (req, res) => {
     await estimates.save();
     res.status(201).json({ message: "success" });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "success" });
   }
 };
