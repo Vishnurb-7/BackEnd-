@@ -108,14 +108,16 @@ const otpVerify = async (req, res) => {
     const { mobile, otp } = req.body;
 
     const response = await otpVerifyFunction(otp, mobile);
+
     if (response.status === true) {
       await User.updateOne({ phone: mobile }, { verified: true });
       res.status(201).json({ message: "otp verification successful" });
     } else {
-      res.status(400).json({ message: " invalid otp verification " });
+      res.status(400).json({ message: "invalid otp verification" });
     }
   } catch (error) {
-    res.status(400).json({ message: "otp failed", error: error.massage });
+    console.log(error)
+    res.status(400).json({ message: "otp failed", error: error.message });
   }
 };
 exports.otpVerify = otpVerify;
